@@ -11,10 +11,17 @@ function App(){
 
   function handleSearch(city){
     setLoading(true);
+    setError(null);
     const URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${import.meta.env.VITE_WEATHER_API_KEY}&units=metric`
     fetch(URL)
     .then(res => res.json())
     .then((data)=>{
+      if (data.cod !== 200) {
+        setError("city not found");
+        setWeather(null);
+        setLoading(false)
+        return; 
+      }
       console.log(data);
       setWeather(data);
       setLoading(false);
@@ -26,7 +33,9 @@ function App(){
     <div>
       <h1> Weather Dashboard </h1>
       <SearchBar onSearch={handleSearch}/>
-      {weather & <WeatherCard weather={weather}/>}
+      {error && <p>{error}</p>}
+      {loading && !error && <p> Loading...</p>}
+      {weather && !loading && !error &&  <WeatherCard weather={weather}/>}
       <ForecastList/>
     </div>
   )
